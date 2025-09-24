@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bowel and Bladder Diary - Fillable Form</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #4f46e5;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin: -20px -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .patient-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .patient-info label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .patient-info input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .controls button {
+            margin: 0 5px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-clear { background-color: #6c757d; color: white; }
+        .btn-export { background-color: #28a745; color: white; }
+        .btn-print { background-color: #007bff; color: white; }
+        .btn-sample { background-color: #6f42c1; color: white; }
+        .btn-clear:hover { background-color: #5a6268; }
+        .btn-export:hover { background-color: #218838; }
+        .btn-print:hover { background-color: #0069d9; }
+        .btn-sample:hover { background-color: #5a32a3; }
+        
+        .diary-table { 
+            width: 100%;
+            border-collapse: collapse; 
+            font-size: 11px;
+            margin-bottom: 20px;
+        }
+        .diary-table th, .diary-table td { 
+            border: 1px solid #333; 
+            padding: 4px; 
+            text-align: center;
+        }
+        .diary-table th { 
+            background-color: #f0f0f0; 
+            font-weight: bold; 
+            font-size: 10px;
+        }
+        .diary-table input, .diary-table select { 
+            width: 100%; 
+            border: none; 
+            background: transparent; 
+            text-align: center; 
+            font-size: 10px;
+            padding: 2px;
+        }
+        .diary-table input:focus, .diary-table select:focus { 
+            outline: 2px solid #007bff; 
+        }
+        
+        .notes-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .notes-section label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .notes-section textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: Arial, sans-serif;
+        }
+        
+        .legend {
+            font-size: 10px;
+            background-color: #f9f9f9;
+            padding: 8px;
+        }
+        
+        @media print {
+            .controls, .header, .notes-section { display: none; }
+            body { margin: 0; background: white; }
+            .container { box-shadow: none; }
+        }
+        
+        @media (max-width: 768px) {
+            .patient-info { grid-template-columns: 1fr; }
+            .controls button { 
+                display: block; 
+                width: 100%; 
+                margin: 5px 0; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bowel and Bladder Diary - Fillable Form</h1>
+            <p>Fill out directly and export as PDF or CSV</p>
+        </div>
+
+        <!-- Patient Info -->
+        <div class="patient-info">
+            <div>
+                <label for="patientName">Patient Name:</label>
+                <input type="text" id="patientName">
+            </div>
+            <div>
+                <label for="patientDOB">Date of Birth:</label>
+                <input type="date" id="patientDOB">
+            </div>
+            <div>
+                <label for="diaryDate">Date:</label>
+                <input type="date" id="diaryDate">
+            </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="controls">
+            <button class="btn-clear" onclick="clearForm()">Clear Form</button>
+            <button class="btn-export" onclick="exportCSV()">Export CSV</button>
+            <button class="btn-print" onclick="window.print()">Print/Save PDF</button>
+            <button class="btn-sample" onclick="fillSampleData()">Fill Sample Data</button>
+        </div>
+
+        <!-- Main Diary Table -->
+        <table class="diary-table">
+            <thead>
+                <tr>
+                    <th rowspan="2" style="width: 8%;">Time</th>
+                    <th colspan="2" style="width: 20%;">Beverage</th>
+                    <th colspan="3" style="width: 28%;">Urination</th>
+                    <th colspan="2" style="width: 22%;">Bowel Movement</th>
+                    <th colspan="2" style="width: 22%;">Pad/Brief/Guard Use</th>
+                </tr>
+                <tr>
+                    <th>Type</th>
+                    <th>Amount<br>(oz)</th>
+                    <th>Volume<br>of Urine<br>(oz.)</th>
+                    <th>Urge<br>(0-3)</th>
+                    <th>Leakage<br>(S,M,L)</th>
+                    <th>Consistency<br>(H,S,L,N)</th>
+                    <th>Leakage<br>(S,M,L)</th>
+                    <th>If changed<br>(D,W,S)</th>
+                    <th>Pad Changed<br>(Y,N)</th>
+                </tr>
+            </thead>
+            <tbody id="dataRows">
+                <!-- Rows will be generated by JavaScript -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="10" class="legend">
+                        <strong>Key:</strong> Leakage: S=Small, M=Medium, L=Large | Consistency: H=Hard, S=Soft, L=Liquid, N=Normal | Pad Change: D=Damp, W=Wet, S=Soaked | Urge: 0=no urgency, 3=severe urgency
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Notes Section -->
+        <div class="notes-section">
+            <label for="notesField">Notes:</label>
+            <textarea id="notesField" rows="4" placeholder="Add any additional notes or observations here..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            generateRows();
+            setCurrentDate();
+        });
+
+        function setCurrentDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('diaryDate').value = today;
+        }
+
+        function generateRows() {
+            const tbody = document.getElementById('dataRows');
+            tbody.innerHTML = '';
+            
+            // Generate 25 rows
+            for (let i = 0; i < 25; i++) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="time" name="time_${i}"></td>
+                    <td><input type="text" name="beverage_type_${i}"></td>
+                    <td><input type="number" name="beverage_amount_${i}" min="0" max="999"></td>
+                    <td><input type="number" name="urine_volume_${i}" min="0" max="999"></td>
+                    <td>
+                        <select name="urge_${i}">
+                            <option value=""></option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="urine_leakage_${i}">
+                            <option value=""></option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="bowel_consistency_${i}">
+                            <option value=""></option>
+                            <option value="H">H</option>
+                            <option value="S">S</option>
+                            <option value="L">L</option>
+                            <option value="N">N</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="bowel_leakage_${i}">
+                            <option value=""></option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="pad_condition_${i}">
+                            <option value=""></option>
+                            <option value="D">D</option>
+                            <option value="W">W</option>
+                            <option value="S">S</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="pad_changed_${i}">
+                            <option value=""></option>
+                            <option value="Y">Y</option>
+                            <option value="N">N</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        function clearForm() {
+            if (confirm('Clear all form data?')) {
+                const inputs = document.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    if (input.type !== 'date' || input.id !== 'diaryDate') {
+                        input.value = '';
+                    }
+                });
+            }
+        }
+
+        function fillSampleData() {
+            document.getElementById('patientName').value = 'Jane Smith';
+            document.getElementById('patientDOB').value = '1975-03-22';
+            document.getElementById('notesField').value = 'Sample entries for demonstration';
+            
+            // Sample entries
+            const samples = [
+                ['07:00', 'Coffee', '8', '200', '1', '', 'N', '', '', 'N'],
+                ['08:15', '', '', '150', '2', 'S', '', '', 'D', 'Y'],
+                ['10:00', 'Water', '12', '', '', '', '', '', '', 'N'],
+            ];
+
+            samples.forEach((data, index) => {
+                document.querySelector(`input[name="time_${index}"]`).value = data[0];
+                document.querySelector(`input[name="beverage_type_${index}"]`).value = data[1];
+                document.querySelector(`input[name="beverage_amount_${index}"]`).value = data[2];
+                document.querySelector(`input[name="urine_volume_${index}"]`).value = data[3];
+                document.querySelector(`select[name="urge_${index}"]`).value = data[4];
+                document.querySelector(`select[name="urine_leakage_${index}"]`).value = data[5];
+                document.querySelector(`select[name="bowel_consistency_${index}"]`).value = data[6];
+                document.querySelector(`select[name="bowel_leakage_${index}"]`).value = data[7];
+                document.querySelector(`select[name="pad_condition_${index}"]`).value = data[8];
+                document.querySelector(`select[name="pad_changed_${index}"]`).value = data[9];
+            });
+            
+            alert('Sample data filled!');
+        }
+
+        function exportCSV() {
+            const patientName = document.getElementById('patientName').value;
+            const patientDOB = document.getElementById('patientDOB').value;
+            const diaryDate = document.getElementById('diaryDate').value;
+            const notes = document.getElementById('notesField').value;
+
+            const csvRows = [];
+            
+            // Patient information
+            csvRows.push('PATIENT INFORMATION');
+            csvRows.push(`"Patient Name","${patientName || 'Not provided'}"`);
+            csvRows.push(`"Date of Birth","${patientDOB || 'Not provided'}"`);
+            csvRows.push(`"Diary Date","${diaryDate || 'Not provided'}"`);
+            csvRows.push(`"Notes","${notes || 'None'}"`);
+            csvRows.push('');
+
+            // Headers
+            csvRows.push('DIARY ENTRIES');
+            const headers = [
+                'Time', 'Beverage Type', 'Beverage Amount (oz)', 'Urine Volume (oz)',
+                'Urge (0-3)', 'Urine Leakage (S,M,L)', 'Bowel Consistency (H,S,L,N)', 
+                'Bowel Leakage (S,M,L)', 'Pad Condition (D,W,S)', 'Pad Changed (Y,N)'
+            ];
+            csvRows.push(headers.map(h => `"${h}"`).join(','));
+
+            // Data rows
+            for (let i = 0; i < 25; i++) {
+                const time = document.querySelector(`input[name="time_${i}"]`)?.value || '';
+                const bevType = document.querySelector(`input[name="beverage_type_${i}"]`)?.value || '';
+                const bevAmount = document.querySelector(`input[name="beverage_amount_${i}"]`)?.value || '';
+                const urineVol = document.querySelector(`input[name="urine_volume_${i}"]`)?.value || '';
+                const urge = document.querySelector(`select[name="urge_${i}"]`)?.value || '';
+                const urineLeakage = document.querySelector(`select[name="urine_leakage_${i}"]`)?.value || '';
+                const bowelConsist = document.querySelector(`select[name="bowel_consistency_${i}"]`)?.value || '';
+                const bowelLeakage = document.querySelector(`select[name="bowel_leakage_${i}"]`)?.value || '';
+                const padCond = document.querySelector(`select[name="pad_condition_${i}"]`)?.value || '';
+                const padChanged = document.querySelector(`select[name="pad_changed_${i}"]`)?.value || '';
+
+                // Only include rows with data
+                if (time || bevType || bevAmount || urineVol || urge || urineLeakage || bowelConsist || bowelLeakage || padCond || padChanged) {
+                    const row = [time, bevType, bevAmount, urineVol, urge, urineLeakage, bowelConsist, bowelLeakage, padCond, padChanged];
+                    const escapedRow = row.map(field => `"${String(field).replace(/"/g, '""')}"`);
+                    csvRows.push(escapedRow.join(','));
+                }
+            }
+
+            // Download file
+            let filename = 'diary_form';
+            if (patientName) {
+                filename = patientName.replace(/[^a-zA-Z0-9]/g, '_') + '_diary';
+            }
+            if (diaryDate) {
+                filename += '_' + diaryDate;
+            }
+            filename += '.csv';
+
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('CSV exported successfully!');
+        }
+    </script>
+</body>
+</html>
